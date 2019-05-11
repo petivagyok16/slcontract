@@ -5,6 +5,7 @@ import com.api.slcontract.domain.User;
 import com.api.slcontract.exception.CustomException;
 import com.api.slcontract.repository.UserRepository;
 import com.api.slcontract.security.jwt.JwtTokenProvider;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -20,6 +21,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 @Service
+@Slf4j
 public class AuthService {
 
 	@Autowired
@@ -39,8 +41,7 @@ public class AuthService {
 			String username = data.getUsername();
 			this.authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(username, data.getPassword()));
 			String token = this.jwtTokenProvider.createToken(username, this.userRepository.findByUsername(username).orElseThrow(() -> new UsernameNotFoundException("User " + username + "not found")).getRoles());
-
-			Map<String, Object> model = new HashMap<>();
+			Map<Object, Object> model = new HashMap<>();
 			model.put("user", username);
 			model.put("token", token);
 			return ResponseEntity.ok(model);
@@ -54,7 +55,7 @@ public class AuthService {
 			user.setPassword(passwordEncoder.encode(user.getPassword()));
 			User savedUser = this.userRepository.save(user);
 			String token = this.jwtTokenProvider.createToken(savedUser.getUsername(), savedUser.getRoles());
-			Map<String, Object> model = new HashMap<>();
+			Map<Object, Object> model = new HashMap<>();
 			model.put("user", savedUser.getUsername());
 			model.put("token", token);
 			return ResponseEntity.ok(model);

@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.MongoId;
 import org.springframework.security.core.GrantedAuthority;
@@ -21,8 +22,6 @@ import java.util.stream.Collectors;
 
 @Document(collection = "users")
 @Data
-@Builder
-@NoArgsConstructor
 public class User implements UserDetails {
 
 	@MongoId
@@ -40,10 +39,8 @@ public class User implements UserDetails {
 	private List<String> roles = new ArrayList<>();
 
 	public User(
-					@JsonProperty("id") String id,
 					@JsonProperty("username") String username,
 					@JsonProperty("password") String password) {
-		this.id = id;
 		this.username = username;
 		this.password = password;
 	}
