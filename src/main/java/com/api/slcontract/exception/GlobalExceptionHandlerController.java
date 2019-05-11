@@ -45,9 +45,10 @@ public class GlobalExceptionHandlerController {
 		res.sendError(HttpStatus.FORBIDDEN.value(), "Access denied");
 	}
 
-	@Profile("prod")
+	@Profile("prod") // TODO: Why is this not working?
 	@ExceptionHandler(Exception.class)
-	public void handleException(HttpServletResponse res) throws IOException {
+	public void handleException(HttpServletResponse res, Exception ex) throws IOException {
+		ex.printStackTrace();
 		res.sendError(HttpStatus.BAD_REQUEST.value(), "Something went wrong");
 	}
 
