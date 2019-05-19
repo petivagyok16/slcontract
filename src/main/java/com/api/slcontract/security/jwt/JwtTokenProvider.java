@@ -1,8 +1,10 @@
 package com.api.slcontract.security.jwt;
 
+import com.api.slcontract.exception.CustomException;
 import io.jsonwebtoken.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -48,34 +50,37 @@ public class JwtTokenProvider {
 							.compact();
 		}
 
-		public Authentication getAuthentication(String token) {
+		Authentication getAuthentication(String token) {
 			UserDetails userDetails = this.userDetailsService.loadUserByUsername(getUsername(token));
 			return new UsernamePasswordAuthenticationToken(userDetails, "", userDetails.getAuthorities());
 		}
 
 		public String getUsername(String token) {
-			return Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token).getBody().getSubject();
+			return this.parseClaims(token).getBody().getSubject();
 		}
 
 		public String resolveToken(HttpServletRequest req) {
 			String bearerToken = req.getHeader("Authorization");
 			if (bearerToken != null && bearerToken.startsWith("Bearer ")) {
-				return bearerToken.substring(7, bearerToken.length());
+				return bearerToken.substring(7);
 			}
 			return null;
 		}
 
-		public boolean validateToken(String token) {
+		boolean validateToken(String token) {
+			Jws<Claims> claims = this.parseClaims(token);
+
+			if (claims.getBody().getExpiration().before(new Date())) {
+				return false;
+			}
+			return true;
+		}
+
+		private Jws<Claims> parseClaims(String token) {
 			try {
-				Jws<Claims> claims = Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token);
-
-				if (claims.getBody().getExpiration().before(new Date())) {
-					return false;
-				}
-
-				return true;
+				return Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token);
 			} catch (JwtException | IllegalArgumentException e) {
-				throw new InvalidJwtAuthenticationException("Expired or invalid JWT token");
+				throw new CustomException("Expired or invalid JWT token", HttpStatus.UNAUTHORIZED);
 			}
 		}
 }

@@ -17,6 +17,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -62,6 +63,15 @@ public class AuthService {
 		} else {
 			throw new CustomException("Username is already in use", HttpStatus.CONFLICT);
 		}
+	}
+
+	public ResponseEntity whoAmI(HttpServletRequest req) {
+		return userRepository.findByUsername(jwtTokenProvider.getUsername(jwtTokenProvider.resolveToken(req)))
+						.map(user -> {
+							Map<Object, Object> model = new HashMap<>();
+							model.put("user", user.getUsername());
+							return ResponseEntity.ok(model);
+						}).orElse(null);
 	}
 
 }

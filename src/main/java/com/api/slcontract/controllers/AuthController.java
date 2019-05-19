@@ -9,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
 @RestController
@@ -30,5 +31,10 @@ public class AuthController {
 	public ResponseEntity signup(@Valid @RequestBody User user) {
 		log.info("user: " + user);
 		return this.authService.signUp(user);
+	}
+
+	@GetMapping("/me")
+	public ResponseEntity whoAmI(HttpServletRequest req) {
+		return this.authService.whoAmI(req);
 	}
 }
