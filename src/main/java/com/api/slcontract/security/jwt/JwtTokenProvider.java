@@ -1,5 +1,6 @@
 package com.api.slcontract.security.jwt;
 
+import com.api.slcontract.domain.Role;
 import com.api.slcontract.exception.CustomException;
 import io.jsonwebtoken.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,7 +35,7 @@ public class JwtTokenProvider {
 			secretKey = Base64.getEncoder().encodeToString(secretKey.getBytes());
 		}
 
-		public String createToken(String username, List<String> roles) {
+		public String createToken(String username, List<Role> roles) {
 
 			Claims claims = Jwts.claims().setSubject(username);
 			claims.put("roles", roles);

@@ -15,6 +15,7 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -33,19 +34,19 @@ public class User implements UserDetails {
 	@Size(min = 4, message = "Password must be at least 4 characters long!")
 	private String password;
 
-	@Builder.Default
-	private List<String> roles = new ArrayList<>();
+	private List<Role> roles;
 
 	public User(
 					@JsonProperty("username") String username,
 					@JsonProperty("password") String password) {
 		this.username = username;
 		this.password = password;
+		this.roles = Collections.singletonList(Role.ROLE_CLIENT);
 	}
 
 	@Override
 	public Collection<? extends GrantedAuthority> getAuthorities() {
-		return this.roles.stream().map(SimpleGrantedAuthority::new).collect(Collectors.toList());
+		return new ArrayList<>(this.roles);
 	}
 
 	@Override

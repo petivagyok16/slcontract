@@ -20,6 +20,7 @@ import org.springframework.stereotype.Service;
 import javax.servlet.http.HttpServletRequest;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 @Service
 @Slf4j
@@ -70,8 +71,10 @@ public class AuthService {
 						.map(user -> {
 							Map<Object, Object> model = new HashMap<>();
 							model.put("user", user.getUsername());
+							model.put("id", user.getId());
 							return ResponseEntity.ok(model);
 						}).orElse(null);
+//		return ResponseEntity.ok(userRepository.findByUsername(jwtTokenProvider.getUsername(jwtTokenProvider.resolveToken(req))));
 	}
 
 }
